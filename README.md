@@ -3,7 +3,7 @@ childprocess
 
 [![NPM version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]
-[![Test coverage][coveralls-image]][coveralls-url]
+[![Test coverage][cov-image]][cov-url]
 [![Gittip][gittip-image]][gittip-url]
 [![David deps][david-image]][david-url]
 [![npm download][download-image]][download-url]
@@ -12,8 +12,8 @@ childprocess
 [npm-url]: https://npmjs.org/package/childprocess
 [travis-image]: https://img.shields.io/travis/node-modules/childprocess.svg?style=flat-square
 [travis-url]: https://travis-ci.org/node-modules/childprocess
-[coveralls-image]: https://img.shields.io/coveralls/node-modules/childprocess.svg?style=flat-square
-[coveralls-url]: https://coveralls.io/r/node-modules/childprocess?branch=master
+[cov-image]: https://codecov.io/github/node-modules/childprocess/coverage.svg?branch=master
+[cov-url]: https://codecov.io/github/node-modules/childprocess?branch=master
 [gittip-image]: https://img.shields.io/gittip/fengmk2.svg?style=flat-square
 [gittip-url]: https://www.gittip.com/fengmk2/
 [david-image]: https://img.shields.io/david/node-modules/childprocess.svg?style=flat-square

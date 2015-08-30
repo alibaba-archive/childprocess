@@ -1,7 +1,7 @@
 {
   "name": "childprocess",
   "version": "1.0.0",
-  "description": "childprocess",
+  "description": "Wrap `child_process` module to support Multiple Process Code Coverage with istanbul.",
   "main": "index.js",
   "files": [
     "index.js"
@@ -33,7 +33,13 @@
     "email": "m@fengmk2.com"
   },
   "keywords": [
-    "childprocess"
+    "childprocess",
+    "child_process",
+    "multiple_process",
+    "istanbul",
+    "coverage",
+    "cov",
+    "codecov"
   ],
   "engines": {
     "iojs": ">=1.0.0"
