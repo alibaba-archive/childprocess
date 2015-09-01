@@ -153,4 +153,48 @@ describe('fork()', function () {
 
   });
 
+  describe('fork with autoCoverage = false', function () {
+
+    before(function (done) {
+      this.child = childprocess.fork(childpath, null, {
+        autoCoverage: false,
+      });
+      this.child.once('message', function (msg) {
+        assert.deepEqual(msg, {
+          message: 'start with empty work',
+          running_under_istanbul: true,
+        });
+        done();
+      });
+    });
+
+    after(function (done) {
+      this.child.send({
+        type: 'exit'
+      });
+      this.child.on('exit', function (code) {
+        assert.equal(code, 0);
+        done();
+      });
+    });
+
+    it('should get reply from child process', function (done) {
+      this.child.send({
+        foo: 'bar',
+        hi: 1,
+      });
+      this.child.once('message', function (msg) {
+        assert.deepEqual(msg, {
+          type: 'reply',
+          msg: {
+            foo: 'bar',
+            hi: 1,
+          }
+        });
+        done();
+      });
+    });
+
+  });
+
 });

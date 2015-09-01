@@ -19,7 +19,12 @@ const childprocess = require('child_process');
 exports.fork = function (modulePath, args, options) {
   let execFile = modulePath;
   let execArgs = args || [];
-  if (process.env.running_under_istanbul) {
+  options = options || {};
+  if (typeof options.autoCoverage !== 'boolean') {
+    // default to enable auto cover
+    options.autoCoverage = true;
+  }
+  if (options.autoCoverage && process.env.running_under_istanbul) {
     execFile = './node_modules/.bin/istanbul';
     execArgs = [
       'cover',
@@ -31,4 +36,8 @@ exports.fork = function (modulePath, args, options) {
   }
 
   return childprocess.fork(execFile, execArgs, options);
+};
+
+exports.spawn = function(command, args, options) {
+  return childprocess.spawn(command, args, options);
 };
