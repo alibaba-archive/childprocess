@@ -42,7 +42,7 @@
     "codecov"
   ],
   "engines": {
-    "iojs": ">=1.0.0"
+    "node": ">=0.12.0"
   },
   "author": "fengmk2 <m@fengmk2.com> (http://fengmk2.com)",
   "license": "MIT"

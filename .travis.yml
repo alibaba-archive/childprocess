@@ -4,6 +4,7 @@ node_js:
   - '3'
   - '2'
   - '1'
+  - '0.12'
 script:
   - 'npm run test'
 after_script:

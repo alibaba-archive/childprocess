@@ -14,12 +14,12 @@
  * Module dependencies.
  */
 
-const mm = require('mm');
-const assert = require('assert');
-const path = require('path');
-const childprocess = require('../');
+var mm = require('mm');
+var assert = require('assert');
+var path = require('path');
+var childprocess = require('../');
 
-const childpath = path.join(__dirname, '..', 'fixtures', 'child.js');
+var childpath = path.join(__dirname, '..', 'fixtures', 'child.js');
 
 describe('fork()', function () {
 

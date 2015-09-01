@@ -14,11 +14,11 @@
  * Module dependencies.
  */
 
-const childprocess = require('child_process');
+var childprocess = require('child_process');
 
 exports.fork = function (modulePath, args, options) {
-  let execFile = modulePath;
-  let execArgs = args || [];
+  var execFile = modulePath;
+  var execArgs = args || [];
   options = options || {};
   if (typeof options.autoCoverage !== 'boolean') {
     // default to enable auto cover
