@@ -28,6 +28,27 @@ Wrap `child_process` module to support [Multiple Process Code Coverage](https://
 $ npm i childprocess
 ```
 
+## Usage
+
+```js
+const childprocess = require('childprocess');
+childprocess.inject(function(modulePath, args, opt) {
+  const execFile = 'path/to/istanbul';
+  const cwd = opt.cwd && process.cwd();
+  const execArgs = [
+    'cover',
+    '--root', cwd,
+    '--dir', path.join(cwd, './coverage'),
+    '--report', 'none',
+    '--print', 'none',
+    '--include-pid',
+    modulePath,
+    '--',
+  ].concat(args);
+  return [execFile, execArgs, opt];
+});
+```
+
 ## APIs
 
 All APIs are same as [child_process](https://iojs.org/api/child_process.html) module.

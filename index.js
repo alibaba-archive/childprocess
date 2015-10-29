@@ -1,56 +1,62 @@
-/**!
- * child_process wrapper with code coverage support
- *
- * Copyright(c) node-modules and other contributors.
- * MIT Licensed
- *
- * Authors:
- *   fengmk2 <m@fengmk2.com> (http://fengmk2.com)
- */
-
 'use strict';
 
-/**
- * Module dependencies.
- */
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const assert = require('assert');
+const cp = require('child_process');
+const originFork = cp.fork;
+const childprocess = module.filename;
+let callback = null, callbackPath = '';
+let tmpdir = process.env.TMPDIR || os.tmpdir();
 
-var path = require('path');
-var childprocess = require('child_process');
+cp.fork = function(modulePath, args, options) {
+  if (!(callback && callbackPath)) {
+    return originFork.call(cp, modulePath, args, options);
+  }
 
-exports.fork = function (modulePath, args, options) {
-  var execFile = modulePath;
-  var execArgs = args || [];
-  options = options || {};
-  if (typeof options.autoCoverage !== 'boolean') {
-    // default to enable auto cover
-    options.autoCoverage = true;
+  modulePath = require.resolve(modulePath);
+  const tmpFile = path.join(tmpdir, modulePath.replace(/\//g, '_') + Date.now() + '.js');
+  const inject = `
+    const childprocess = require('${childprocess}');
+    childprocess.inject('${callbackPath}');
+    require('${modulePath}');
+  `;
+  fs.writeFileSync(tmpFile, inject);
+
+  args = callback(tmpFile, args, options);
+  if (!args || args.length !== 3) {
+    args = [modulePath, args, options];
   }
-  if (options.autoCoverage && process.env.running_under_istanbul) {
-    if (options.cwd) {
-      execFile = path.join(process.cwd(), './node_modules/.bin/istanbul');
-      execArgs = [
-        'cover',
-        '--root', process.cwd(),
-        '--dir', path.join(process.cwd(), './coverage'),
-        '--report', 'none',
-        '--print', 'none',
-        '--include-pid',
-        modulePath, '--',
-      ].concat(execArgs);
-    } else {
-      execFile = './node_modules/.bin/istanbul';
-      execArgs = [
-        'cover',
-        '--report', 'none',
-        '--print', 'none',
-        '--include-pid',
-        modulePath, '--',
-      ].concat(execArgs);
-    }
-  }
-  return childprocess.fork(execFile, execArgs, options);
+
+  const proc = originFork.apply(cp, args);
+  proc.on('exit', function() {
+    fs.unlinkSync(tmpFile);
+  });
+  return proc;
 };
 
-exports.spawn = function(command, args, options) {
-  return childprocess.spawn(command, args, options);
+exports.inject = function(cb) {
+  // inject('/path/to/jsfile')
+  if (typeof cb === 'string') {
+    callbackPath = cb;
+    assert.ok(callbackPath, 'filepath should not be empty');
+    assert.ok(fs.existsSync(callbackPath), callbackPath + ' should exist');
+    callback = require(callbackPath);
+    return;
+  }
+
+  // inject(function() {})
+  if (typeof cb === 'function') {
+    callbackPath = path.join(tmpdir, 'callback_' + Date.now() + '.js');
+    callback = cb;
+    fs.writeFileSync(callbackPath, `module.exports = ${cb.toString()};`);
+    return;
+  }
+
+  throw new Error('argument in .inject() should be function or filepath');
+};
+
+exports.reset = function() {
+  callbackPath = '';
 };

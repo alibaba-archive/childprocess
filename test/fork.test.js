@@ -16,16 +16,119 @@ var pedding = require('pedding');
 var mm = require('mm');
 var assert = require('assert');
 var path = require('path');
+var coffee = require('coffee');
+var spy = require('spy');
+var cp = require('child_process');
 var childprocess = require('../');
 
-var childpath = path.join(__dirname, '..', 'fixtures', 'child.js');
+var childpath = path.join(__dirname, 'fixtures', 'child.js');
 
 describe('fork()', function () {
+
+  before(function() {
+    spy(cp, 'fork');
+  });
+  afterEach(function() {
+    cp.fork.reset();
+  });
+  after(function() {
+    cp.fork.restore();
+  });
+
+  it('should assert type', function() {
+    assert.throws(function() {
+      childprocess.inject();
+    }, /argument in \.inject\(\) should be function or filepath/);
+  });
+
+  it('should call original fork', function(done) {
+    coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+    .debug()
+    .expect('code', 0)
+    .end(function(err, res) {
+      assert.ifError(err);
+      assert.equal(res.stdout, '');
+      done();
+    });
+  });
+
+  describe('inject function', function() {
+
+    before(function() {
+      childprocess.inject(function(modulePath, args, opt) {
+        console.log(modulePath);
+        return [modulePath, args, opt];
+      });
+    });
+    after(function() {
+      childprocess.reset();
+    });
+
+    it('should work', function(done) {
+      coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+      .debug()
+      .expect('stdout', /test_fixtures_multi_process_child\.js/)
+      .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
+      .expect('code', 0)
+      .end(function(err) {
+        assert.ifError(err);
+        assert.ok(/test\/fixtures\/multi_process\/index\.js/.test(cp.fork.calls[0].arguments[0]));
+        done();
+      });
+    });
+  });
+
+  describe('inject jsfile', function() {
+
+    before(function() {
+      childprocess.inject(path.join(__dirname, 'fixtures/inject.js'));
+    });
+    after(function() {
+      childprocess.reset();
+    });
+
+    it('should work', function(done) {
+      coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+      .expect('stdout', /test_fixtures_multi_process_child\.js/)
+      .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
+      .expect('code', 0)
+      .end(function(err) {
+        assert.ifError(err);
+        assert.ok(/test\/fixtures\/multi_process\/index\.js/.test(cp.fork.calls[0].arguments[0]));
+        done();
+      });
+    });
+  });
+
+  describe('inject function that returned is not expected', function() {
+
+    before(function() {
+      childprocess.inject(function(modulePath) {
+        console.log(modulePath);
+        return [];
+      });
+    });
+    after(function() {
+      childprocess.reset();
+    });
+
+    it('should work', function(done) {
+      coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+      .debug()
+      .expect('code', 0)
+      .end(function(err, res) {
+        assert.ifError(err);
+        assert.equal(res.stdout, '');
+        assert.ok(/test\/fixtures\/multi_process\/index\.js/.test(cp.fork.calls[0].arguments[0]));
+        done();
+      });
+    });
+  });
 
   describe('fork with args', function () {
 
     before(function (done) {
-      this.child = childprocess.fork(childpath, ['1', 'foo']);
+      this.child = cp.fork(childpath, ['1', 'foo']);
       this.child.once('message', function (msg) {
         assert.deepEqual(msg, {
           message: 'start with args work',
@@ -68,7 +171,7 @@ describe('fork()', function () {
   describe('fork without args', function () {
 
     before(function (done) {
-      this.child = childprocess.fork(childpath);
+      this.child = cp.fork(childpath);
       this.child.once('message', function (msg) {
         assert.deepEqual(msg, {
           message: 'start with empty work',
@@ -113,7 +216,7 @@ describe('fork()', function () {
 
     before(function (done) {
       mm(process.env, 'running_under_istanbul', '');
-      this.child = childprocess.fork(childpath);
+      this.child = cp.fork(childpath);
       this.child.once('message', function (msg) {
         assert.deepEqual(msg, {
           message: 'start with empty work',
@@ -155,7 +258,7 @@ describe('fork()', function () {
   describe('fork with autoCoverage = false', function () {
 
     before(function (done) {
-      this.child = childprocess.fork(childpath, null, {
+      this.child = cp.fork(childpath, null, {
         autoCoverage: false,
       });
       this.child.once('message', function (msg) {
@@ -200,7 +303,7 @@ describe('fork()', function () {
     it('should change cwd to test/fixtures/demo', function(done) {
       var childpath = path.join(__dirname, 'fixtures', 'demo', 'foo.js');
       var cwd = path.join(__dirname, 'fixtures', 'demo');
-      var child = childprocess.fork(childpath, [], {
+      var child = cp.fork(childpath, [], {
         cwd: cwd,
       });
       child.on('exit', function (code) {
@@ -213,7 +316,7 @@ describe('fork()', function () {
   describe('spawn()', function() {
     it('should spawn work', function(done) {
       done = pedding(2, done);
-      var child = childprocess.spawn('echo', ['hi']);
+      var child = cp.spawn('echo', ['hi']);
       child.stdout.on('data', function(data) {
         assert.equal(data.toString(), 'hi\n');
         done();
