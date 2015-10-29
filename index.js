@@ -1,5 +1,5 @@
 /**!
- * childprocess - index.js
+ * child_process wrapper with code coverage support
  *
  * Copyright(c) node-modules and other contributors.
  * MIT Licensed
@@ -14,6 +14,7 @@
  * Module dependencies.
  */
 
+var path = require('path');
 var childprocess = require('child_process');
 
 exports.fork = function (modulePath, args, options) {
@@ -25,16 +26,28 @@ exports.fork = function (modulePath, args, options) {
     options.autoCoverage = true;
   }
   if (options.autoCoverage && process.env.running_under_istanbul) {
-    execFile = './node_modules/.bin/istanbul';
-    execArgs = [
-      'cover',
-      '--report', 'none',
-      '--print', 'none',
-      '--include-pid',
-      modulePath, '--'
-    ].concat(execArgs);
+    if (options.cwd) {
+      execFile = path.join(process.cwd(), './node_modules/.bin/istanbul');
+      execArgs = [
+        'cover',
+        '--root', process.cwd(),
+        '--dir', path.join(process.cwd(), './coverage'),
+        '--report', 'none',
+        '--print', 'none',
+        '--include-pid',
+        modulePath, '--',
+      ].concat(execArgs);
+    } else {
+      execFile = './node_modules/.bin/istanbul';
+      execArgs = [
+        'cover',
+        '--report', 'none',
+        '--print', 'none',
+        '--include-pid',
+        modulePath, '--',
+      ].concat(execArgs);
+    }
   }
-
   return childprocess.fork(execFile, execArgs, options);
 };
 
