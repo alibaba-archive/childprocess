@@ -18,7 +18,9 @@ childprocess
 [download-image]: https://img.shields.io/npm/dm/childprocess.svg?style=flat-square
 [download-url]: https://npmjs.org/package/childprocess
 
-Wrap `child_process` module to support [Multiple Process Code Coverage](https://github.com/gotwarlost/istanbul#multiple-process-usage) with [istanbul].
+Inject script into multiple process when using `child_process.fork`.
+
+One of the use case is [Multiple Process Code Coverage](https://github.com/gotwarlost/istanbul#multiple-process-usage) with [istanbul].
 
 - [cluster code coverage with istanbul](http://fengmk2.com/blog/2015/cluster-coverage/README.html)
 
@@ -31,8 +33,7 @@ $ npm i childprocess
 ## Usage
 
 ```js
-const childprocess = require('childprocess');
-childprocess.inject(function(modulePath, args, opt) {
+require('childprocess').inject(function(modulePath, args, opt) {
   const execFile = 'path/to/istanbul';
   const cwd = opt.cwd && process.cwd();
   const execArgs = [
@@ -47,23 +48,31 @@ childprocess.inject(function(modulePath, args, opt) {
   ].concat(args);
   return [execFile, execArgs, opt];
 });
+require('child_process').fork();
 ```
 
 ## APIs
 
-All APIs are same as [child_process](https://iojs.org/api/child_process.html) module.
+## inject(cb) / inject(filepath)
 
-- [x] [fork(modulePath[, args][, options])](https://iojs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options)
-- [ ] spawn()
-- [ ] exec()
-- [ ] execFile()
-- [ ] spawnSync()
-- [ ] execFileSync()
-- [ ] execSync()
+Inject script when using `child_process.fork`.
+
+The inject script is a function that running in sandbox in every process. that mean you can't use the variable out of the function.
+
+The function should return an array that contains 3 arguments same as fork.
+
+```js
+childprocess.inject(function(modulePath, args, opt) {
+  return [modulePath, args, opt];
+});
+```
+
+### reset()
+
+Use `child_process.fork` without injected script.
 
 ## License
 
 [MIT](LICENSE)
-
 
 [istanbul]: https://github.com/gotwarlost/istanbul
