@@ -1,4 +1,11 @@
 
+2.0.0 / 2015-10-31
+==================
+
+ * test: coverage 100%
+ * doc: update document
+ * feat: inject script into multiple process
+
 1.0.3 / 2015-10-29
 ==================
 
