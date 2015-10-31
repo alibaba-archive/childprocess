@@ -1,0 +1,6 @@
+{
+  "name": "a",
+  "scripts": {
+    "test": "rm -rf coverage && ../../../node_modules/.bin/istanbul cover --include-pid ../../../node_modules/.bin/_mocha -- -t 10000 && ../../../node_modules/.bin/istanbul report text"
+  }
+}
