@@ -1,11 +1,14 @@
 sudo: false
+env:
+  - npm_registry=https://registry.npmjs.com
 language: node_js
 node_js:
+  - '5'
   - '4'
   - '3'
   - '2'
   - '1'
 script:
-  - 'npm run test'
+  - npm test
 after_script:
-  - 'npm i codecov.io && cat ./coverage/coverage-final.json | ./node_modules/codecov.io/bin/codecov.io.js'
+  - npminstall codecov && codecov

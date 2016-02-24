@@ -5,9 +5,12 @@ const path = require('path');
 const os = require('os');
 const assert = require('assert');
 const cp = require('child_process');
+const utility = require('utility');
+
 const originFork = cp.fork;
-const childprocess = module.filename;
-let callback = null, callbackPath = '';
+const childprocess = __filename;
+let callback = null;
+let callbackPath = '';
 let tmpdir = process.env.TMPDIR || os.tmpdir();
 
 cp.fork = function(modulePath, args, options) {
@@ -24,11 +27,12 @@ cp.fork = function(modulePath, args, options) {
   }
 
   // create a tmp file that inject text and load modulePath
-  const tmpFile = path.join(tmpdir, modulePath.replace(/\//g, '_') + Date.now() + '.js');
+  const tmpFile = path.join(tmpdir, modulePath.replace(/[\:\/\\]+/g, '_') + '.' +
+    utility.md5(modulePath + utility.randomString()) + '.' + Date.now() + '.js');
   const inject = `
-    const childprocess = require('${childprocess}');
-    childprocess.inject('${callbackPath}');
-    require('${modulePath}');
+    const childprocess = require(${JSON.stringify(childprocess)});
+    childprocess.inject(${JSON.stringify(callbackPath)});
+    require(${JSON.stringify(modulePath)});
   `;
   fs.writeFileSync(tmpFile, inject);
 
@@ -58,9 +62,11 @@ exports.inject = function(cb) {
 
   // inject(function() {})
   if (typeof cb === 'function') {
-    callbackPath = path.join(tmpdir, 'callback_' + Date.now() + '.js');
+    var cbString = cb.toString();
+    callbackPath = path.join(tmpdir, 'callback_' + '.' +
+      utility.md5(cbString + utility.randomString()) + '.' + Date.now() + '.js');
     callback = cb;
-    fs.writeFileSync(callbackPath, `module.exports = ${cb.toString()};`);
+    fs.writeFileSync(callbackPath, `module.exports = ${cbString};`);
     return;
   }
 

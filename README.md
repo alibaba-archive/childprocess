@@ -3,6 +3,7 @@ childprocess
 
 [![NPM version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]
+[![appveyor build status][appveyor-image]][appveyor-url]
 [![Test coverage][cov-image]][cov-url]
 [![David deps][david-image]][david-url]
 [![npm download][download-image]][download-url]
@@ -11,6 +12,8 @@ childprocess
 [npm-url]: https://npmjs.org/package/childprocess
 [travis-image]: https://img.shields.io/travis/node-modules/childprocess.svg?style=flat-square
 [travis-url]: https://travis-ci.org/node-modules/childprocess
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/aeh1v06b88nb7ok9?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/fengmk2/childprocess
 [cov-image]: https://codecov.io/github/node-modules/childprocess/coverage.svg?branch=master
 [cov-url]: https://codecov.io/github/node-modules/childprocess?branch=master
 [david-image]: https://img.shields.io/david/node-modules/childprocess.svg?style=flat-square
