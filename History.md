@@ -1,4 +1,10 @@
 
+2.0.1 / 2016-02-25
+==================
+
+  * fix: ensure tmp file unique
+  * fix: support fork tmpfile on windows
+
 2.0.0 / 2015-10-31
 ==================
 
