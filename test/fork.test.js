@@ -43,7 +43,7 @@ describe('fork()', function () {
   });
 
   it('should call original fork', function(done) {
-    coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+    coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
     .debug()
     .expect('code', 0)
     .end(function(err, res) {
@@ -56,16 +56,19 @@ describe('fork()', function () {
   it('should work when inject function', function(done) {
     childprocess.inject(function(modulePath, args, opt) {
       console.log(modulePath);
+      var fs = require('fs');
+      console.log(fs.readFileSync(modulePath, 'utf8'));
       return [modulePath, args, opt];
     });
-    coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+    coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
     .debug()
     .expect('stdout', /test_fixtures_multi_process_child\.js/)
     .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
     .expect('code', 0)
     .end(function(err) {
       assert.ifError(err);
-      assert.ok(/test\/fixtures\/multi_process\/index\.js/.test(cp.fork.calls[0].arguments[0]));
+      assert.ok(/test[\\\/]fixtures[\\\/]multi_process[\\\/]index\.js/.test(cp.fork.calls[0].arguments[0]),
+        cp.fork.calls[0].arguments[0]);
       done();
     });
   });
@@ -76,35 +79,37 @@ describe('fork()', function () {
       console.log(modulePath);
       return [modulePath, args, opt];
     });
-    coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+    coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
     .debug()
     .expect('stdout', /test_fixtures_multi_process_child\.js/)
     .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
     .expect('code', 0)
     .end(function(err) {
       assert.ifError(err);
-      assert.ok(/test\/fixtures\/multi_process\/index\.js/.test(cp.fork.calls[0].arguments[0]));
+      assert.ok(/test[\\\/]fixtures[\\\/]multi_process[\\\/]index\.js/.test(cp.fork.calls[0].arguments[0]),
+        cp.fork.calls[0].arguments[0]);
       done();
     });
   });
 
   it('should fail', function(done) {
-    childprocess.inject(path.join(__dirname, 'fixtures/inject.js'));
-    coffee.fork(path.join(__dirname, 'fixtures/multi_process/unknown.js'))
+    childprocess.inject(path.join(__dirname, 'fixtures', 'inject.js'));
+    coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'unknown.js'))
     .debug()
     .expect('error', /Cannot find module/)
     .end(done);
   });
 
   it('should work when inject jsfile', function(done) {
-    childprocess.inject(path.join(__dirname, 'fixtures/inject.js'));
-    coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+    childprocess.inject(path.join(__dirname, 'fixtures', 'inject.js'));
+    coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
     .expect('stdout', /test_fixtures_multi_process_child\.js/)
     .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
     .expect('code', 0)
     .end(function(err) {
       assert.ifError(err);
-      assert.ok(/test\/fixtures\/multi_process\/index\.js/.test(cp.fork.calls[0].arguments[0]));
+      assert.ok(/test[\\\/]fixtures[\\\/]multi_process[\\\/]index\.js/.test(cp.fork.calls[0].arguments[0]),
+        cp.fork.calls[0].arguments[0]);
       done();
     });
   });
@@ -114,13 +119,14 @@ describe('fork()', function () {
       console.log(modulePath);
       return [];
     });
-    coffee.fork(path.join(__dirname, 'fixtures/multi_process/index.js'))
+    coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
     .debug()
     .expect('code', 0)
     .end(function(err, res) {
       assert.ifError(err);
       assert.equal(res.stdout, '');
-      assert.ok(/test\/fixtures\/multi_process\/index\.js/.test(cp.fork.calls[0].arguments[0]));
+      assert.ok(/test[\\\/]fixtures[\\\/]multi_process[\\\/]index\.js/.test(cp.fork.calls[0].arguments[0]),
+        cp.fork.calls[0].arguments[0]);
       done();
     });
   });

@@ -13,7 +13,9 @@
     "autod": "autod -w --prefix '~'",
     "clean": "rm -rf coverage"
   },
-  "dependencies": {},
+  "dependencies": {
+    "utility": "~1.6.0"
+  },
   "devDependencies": {
     "autod": "*",
     "coffee": "1",
