@@ -5,9 +5,11 @@ const path = require('path');
 const os = require('os');
 const assert = require('assert');
 const cp = require('child_process');
+
 const originFork = cp.fork;
 const childprocess = module.filename;
-let callback = null, callbackPath = '';
+let callback = null;
+let callbackPath = '';
 let tmpdir = process.env.TMPDIR || os.tmpdir();
 
 cp.fork = function(modulePath, args, options) {
@@ -24,7 +26,7 @@ cp.fork = function(modulePath, args, options) {
   }
 
   // create a tmp file that inject text and load modulePath
-  const tmpFile = path.join(tmpdir, modulePath.replace(/\//g, '_') + Date.now() + '.js');
+  const tmpFile = path.join(tmpdir, modulePath.replace(/[\:\/\\]+/g, '_') + Date.now() + '.js');
   const inject = `
     const childprocess = require('${childprocess}');
     childprocess.inject('${callbackPath}');
