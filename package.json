@@ -1,6 +1,6 @@
 {
   "name": "childprocess",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Wrap `child_process` module to support Multiple Process Code Coverage with istanbul.",
   "main": "index.js",
   "files": [

@@ -1,4 +1,9 @@
 
+2.0.2 / 2016-06-20
+==================
+
+  * fix: should let the original file as mainModule rather than the mock file (#6)
+
 2.0.1 / 2016-02-25
 ==================
 
