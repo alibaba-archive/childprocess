@@ -73,6 +73,17 @@ describe('fork()', function () {
     });
   });
 
+  it('should reset mainModule', function(done) {
+    childprocess.inject(function(modulePath, args, opt) {
+      return [modulePath, args, opt];
+    });
+    coffee.fork(path.join(__dirname, 'fixtures', 'require-main', 'a.js'))
+    .debug()
+    .expect('stdout', /require.main vs module true/)
+    .expect('code', 0)
+    .end(done);
+  });
+
   it('should work when inject function using os.tmpdir', function(done) {
     mm(process.env, 'TMPDIR', '');
     childprocess.inject(function(modulePath, args, opt) {
