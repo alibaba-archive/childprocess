@@ -29,10 +29,21 @@ cp.fork = function(modulePath, args, options) {
   // create a tmp file that inject text and load modulePath
   const tmpFile = path.join(tmpdir, modulePath.replace(/[\:\/\\]+/g, '_') + '.' +
     utility.md5(modulePath + utility.randomString()) + '.' + Date.now() + '.js');
+  // mainModule should be modulePath not the tmpFile
   const inject = `
+    'use strict';
+    const f = require.extensions['.js'];
+    const modulePath = ${JSON.stringify(modulePath)};
+    require.extensions['.js'] = function(module, filename) {
+      if (filename === modulePath) {
+        process.mainModule = module;
+        require.extensions['.js'] = f;
+      }
+      f(module, filename);
+    }
     const childprocess = require(${JSON.stringify(childprocess)});
     childprocess.inject(${JSON.stringify(callbackPath)});
-    require(${JSON.stringify(modulePath)});
+    require(modulePath);
   `;
   fs.writeFileSync(tmpFile, inject);
 
