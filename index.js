@@ -11,7 +11,7 @@ const originFork = cp.fork;
 const childprocess = __filename;
 let callback = null;
 let callbackPath = '';
-let tmpdir = process.env.TMPDIR || os.tmpdir();
+const tmpdir = process.env.TMPDIR || os.tmpdir();
 
 cp.fork = function(modulePath, args, options) {
   // call original when it's not injected
@@ -22,12 +22,12 @@ cp.fork = function(modulePath, args, options) {
   // call original when modulePath isn't found
   try {
     modulePath = require.resolve(modulePath);
-  } catch(err) {
+  } catch (err) {
     return originFork.call(cp, modulePath, args, options);
   }
 
   // create a tmp file that inject text and load modulePath
-  const tmpFile = path.join(tmpdir, modulePath.replace(/[\:\/\\]+/g, '_') + '.' +
+  const tmpFile = path.join(tmpdir,
     utility.md5(modulePath + utility.randomString()) + '.' + Date.now() + '.js');
   // mainModule should be modulePath not the tmpFile
   const inject = `
@@ -50,7 +50,7 @@ cp.fork = function(modulePath, args, options) {
   // call original when the value that inject callback returned isn't expected
   args = callback(tmpFile, args, options);
   if (!args || args.length !== 3) {
-    args = [modulePath, args, options];
+    args = [ modulePath, args, options ];
   }
 
   const proc = originFork.apply(cp, args);
@@ -73,8 +73,8 @@ exports.inject = function(cb) {
 
   // inject(function() {})
   if (typeof cb === 'function') {
-    var cbString = cb.toString();
-    callbackPath = path.join(tmpdir, 'callback_' + '.' +
+    const cbString = cb.toString();
+    callbackPath = path.join(tmpdir, 'callback_.' +
       utility.md5(cbString + utility.randomString()) + '.' + Date.now() + '.js');
     callback = cb;
     fs.writeFileSync(callbackPath, `module.exports = ${cbString};`);

@@ -12,18 +12,18 @@
  * Module dependencies.
  */
 
-var pedding = require('pedding');
-var mm = require('mm');
-var assert = require('assert');
-var path = require('path');
-var coffee = require('coffee');
-var spy = require('spy');
-var cp = require('child_process');
-var childprocess = require('../');
+const pedding = require('pedding');
+const mm = require('mm');
+const assert = require('assert');
+const path = require('path');
+const coffee = require('coffee');
+const spy = require('spy');
+const cp = require('child_process');
+const childprocess = require('../');
 
-var childpath = path.join(__dirname, 'fixtures', 'child.js');
+const childpath = path.join(__dirname, 'fixtures', 'child.js');
 
-describe('fork()', function () {
+describe('fork()', function() {
 
   before(function() {
     spy(cp, 'fork');
@@ -56,14 +56,13 @@ describe('fork()', function () {
   it('should work when inject function', function(done) {
     childprocess.inject(function(modulePath, args, opt) {
       console.log(modulePath);
-      var fs = require('fs');
+      const fs = require('fs');
       console.log(fs.readFileSync(modulePath, 'utf8'));
-      return [modulePath, args, opt];
+      return [ modulePath, args, opt ];
     });
     coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
     .debug()
-    .expect('stdout', /test_fixtures_multi_process_child\.js/)
-    .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
+    .expect('stdout', /\d+\.js/)
     .expect('code', 0)
     .end(function(err) {
       assert.ifError(err);
@@ -75,7 +74,7 @@ describe('fork()', function () {
 
   it('should reset mainModule', function(done) {
     childprocess.inject(function(modulePath, args, opt) {
-      return [modulePath, args, opt];
+      return [ modulePath, args, opt ];
     });
     coffee.fork(path.join(__dirname, 'fixtures', 'require-main', 'a.js'))
     .debug()
@@ -88,12 +87,11 @@ describe('fork()', function () {
     mm(process.env, 'TMPDIR', '');
     childprocess.inject(function(modulePath, args, opt) {
       console.log(modulePath);
-      return [modulePath, args, opt];
+      return [ modulePath, args, opt ];
     });
     coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
     .debug()
-    .expect('stdout', /test_fixtures_multi_process_child\.js/)
-    .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
+    .expect('stdout', /\d+\.js/)
     .expect('code', 0)
     .end(function(err) {
       assert.ifError(err);
@@ -114,8 +112,7 @@ describe('fork()', function () {
   it('should work when inject jsfile', function(done) {
     childprocess.inject(path.join(__dirname, 'fixtures', 'inject.js'));
     coffee.fork(path.join(__dirname, 'fixtures', 'multi_process', 'index.js'))
-    .expect('stdout', /test_fixtures_multi_process_child\.js/)
-    .expect('stdout', /test_fixtures_multi_process_grandchild\.js/)
+    .expect('stdout', /\d+\.js/)
     .expect('code', 0)
     .end(function(err) {
       assert.ifError(err);
@@ -142,42 +139,42 @@ describe('fork()', function () {
     });
   });
 
-  describe('fork with args', function () {
+  describe('fork with args', function() {
 
-    before(function (done) {
-      this.child = cp.fork(childpath, ['1', 'foo']);
-      this.child.once('message', function (msg) {
+    before(function(done) {
+      this.child = cp.fork(childpath, [ '1', 'foo' ]);
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           message: 'start with args work',
-          args: ['1', 'foo'],
+          args: [ '1', 'foo' ],
           running_under_istanbul: true,
         });
         done();
       });
     });
 
-    after(function (done) {
+    after(function(done) {
       this.child.send({
-        type: 'exit'
+        type: 'exit',
       });
-      this.child.on('exit', function (code) {
+      this.child.on('exit', function(code) {
         assert.equal(code, 0);
         done();
       });
     });
 
-    it('should get reply from child process', function (done) {
+    it('should get reply from child process', function(done) {
       this.child.send({
         foo: 'bar',
         hi: 1,
       });
-      this.child.once('message', function (msg) {
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           type: 'reply',
           msg: {
             foo: 'bar',
             hi: 1,
-          }
+          },
         });
         done();
       });
@@ -185,11 +182,11 @@ describe('fork()', function () {
 
   });
 
-  describe('fork without args', function () {
+  describe('fork without args', function() {
 
-    before(function (done) {
+    before(function(done) {
       this.child = cp.fork(childpath);
-      this.child.once('message', function (msg) {
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           message: 'start with empty work',
           running_under_istanbul: true,
@@ -198,28 +195,28 @@ describe('fork()', function () {
       });
     });
 
-    after(function (done) {
+    after(function(done) {
       this.child.send({
-        type: 'exit'
+        type: 'exit',
       });
-      this.child.on('exit', function (code) {
+      this.child.on('exit', function(code) {
         assert.equal(code, 0);
         done();
       });
     });
 
-    it('should get reply from child process', function (done) {
+    it('should get reply from child process', function(done) {
       this.child.send({
         foo: 'bar',
         hi: 1,
       });
-      this.child.once('message', function (msg) {
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           type: 'reply',
           msg: {
             foo: 'bar',
             hi: 1,
-          }
+          },
         });
         done();
       });
@@ -227,14 +224,14 @@ describe('fork()', function () {
 
   });
 
-  describe('mock running_under_istanbul not exists', function () {
+  describe('mock running_under_istanbul not exists', function() {
 
     afterEach(mm.restore);
 
-    before(function (done) {
+    before(function(done) {
       mm(process.env, 'running_under_istanbul', '');
       this.child = cp.fork(childpath);
-      this.child.once('message', function (msg) {
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           message: 'start with empty work',
           running_under_istanbul: false,
@@ -243,28 +240,28 @@ describe('fork()', function () {
       });
     });
 
-    after(function (done) {
+    after(function(done) {
       this.child.send({
-        type: 'exit'
+        type: 'exit',
       });
-      this.child.on('exit', function (code) {
+      this.child.on('exit', function(code) {
         assert.equal(code, 0);
         done();
       });
     });
 
-    it('should get reply from child process', function (done) {
+    it('should get reply from child process', function(done) {
       this.child.send({
         foo: 'bar',
         hi: 1,
       });
-      this.child.once('message', function (msg) {
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           type: 'reply',
           msg: {
             foo: 'bar',
             hi: 1,
-          }
+          },
         });
         done();
       });
@@ -272,13 +269,13 @@ describe('fork()', function () {
 
   });
 
-  describe('fork with autoCoverage = false', function () {
+  describe('fork with autoCoverage = false', function() {
 
-    before(function (done) {
+    before(function(done) {
       this.child = cp.fork(childpath, null, {
         autoCoverage: false,
       });
-      this.child.once('message', function (msg) {
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           message: 'start with empty work',
           running_under_istanbul: true,
@@ -287,28 +284,28 @@ describe('fork()', function () {
       });
     });
 
-    after(function (done) {
+    after(function(done) {
       this.child.send({
-        type: 'exit'
+        type: 'exit',
       });
-      this.child.on('exit', function (code) {
+      this.child.on('exit', function(code) {
         assert.equal(code, 0);
         done();
       });
     });
 
-    it('should get reply from child process', function (done) {
+    it('should get reply from child process', function(done) {
       this.child.send({
         foo: 'bar',
         hi: 1,
       });
-      this.child.once('message', function (msg) {
+      this.child.once('message', function(msg) {
         assert.deepEqual(msg, {
           type: 'reply',
           msg: {
             foo: 'bar',
             hi: 1,
-          }
+          },
         });
         done();
       });
@@ -318,12 +315,12 @@ describe('fork()', function () {
 
   describe('fork with options.cwd', function() {
     it('should change cwd to test/fixtures/demo', function(done) {
-      var childpath = path.join(__dirname, 'fixtures', 'demo', 'foo.js');
-      var cwd = path.join(__dirname, 'fixtures', 'demo');
-      var child = cp.fork(childpath, [], {
-        cwd: cwd,
+      const childpath = path.join(__dirname, 'fixtures', 'demo', 'foo.js');
+      const cwd = path.join(__dirname, 'fixtures', 'demo');
+      const child = cp.fork(childpath, [], {
+        cwd,
       });
-      child.on('exit', function (code) {
+      child.on('exit', function(code) {
         assert.equal(code, 0);
         done();
       });
@@ -333,12 +330,12 @@ describe('fork()', function () {
   describe('spawn()', function() {
     it('should spawn work', function(done) {
       done = pedding(2, done);
-      var child = cp.spawn('echo', ['hi']);
+      const child = cp.spawn('echo', [ 'hi' ]);
       child.stdout.on('data', function(data) {
         assert.equal(data.toString(), 'hi\n');
         done();
       });
-      child.on('exit', function (code) {
+      child.on('exit', function(code) {
         assert.equal(code, 0);
         done();
       });
