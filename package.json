@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "cover": "istanbul cover --include-all-sources --report none --print none node_modules/mocha/bin/_mocha -- --check-leaks -t 50000 test/*.test.js",
-    "lint": "eslint index.js fixtures test",
+    "lint": "eslint index.js fixtures test --fix",
     "test": "npm run clean && npm run lint && npm run cover && istanbul report --root coverage json lcov html text",
     "autod": "autod -w --prefix '~'",
     "clean": "rm -rf coverage"
@@ -19,7 +19,9 @@
   "devDependencies": {
     "autod": "*",
     "coffee": "1",
-    "eslint": "1",
+    "egg-ci": "^1.0.3",
+    "eslint": "^3.1.0",
+    "eslint-config-egg": "^3.1.0",
     "istanbul": "*",
     "mm": "1",
     "mocha": "*",
@@ -49,5 +51,8 @@
     "node": ">=0.12.0"
   },
   "author": "fengmk2 <m@fengmk2.com> (http://fengmk2.com)",
-  "license": "MIT"
+  "license": "MIT",
+  "ci": {
+    "version": "4, 6"
+  }
 }

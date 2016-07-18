@@ -27,13 +27,13 @@ if (process.argv[2] === '1') {
   });
 }
 
-process.on('message', function (msg) {
+process.on('message', function(msg) {
   console.log('[child] got message %j', msg);
   if (msg.type === 'exit') {
     return process.exit(msg.code || 0);
   }
   process.send({
     type: 'reply',
-    msg: msg
+    msg,
   });
 });
