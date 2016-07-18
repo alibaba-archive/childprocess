@@ -11,7 +11,8 @@
     "lint": "eslint index.js fixtures test --fix",
     "test": "npm run clean && npm run lint && npm run cover && istanbul report --root coverage json lcov html text",
     "autod": "autod -w --prefix '~'",
-    "clean": "rm -rf coverage"
+    "clean": "rm -rf coverage",
+    "ci": "npm run test"
   },
   "dependencies": {
     "utility": "~1.6.0"
